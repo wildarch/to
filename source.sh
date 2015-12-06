@@ -17,6 +17,7 @@ function _to_list {
 	if [ -n "$res" ]; then
 		mapfile -t COMPREPLY < <(/usr/bin/to list $cur)
 	fi
+	compopt -o nospace
 	return 0
 }
-complete -F _to_list to
+complete -F _to_list to -o nospace

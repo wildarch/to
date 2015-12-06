@@ -1,9 +1,10 @@
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{PathBuf};
 use std::vec;
+use std::io::Error;
 
-const WORKSPACE_PATH: &'static str = "/home/daan/workspace";
+const WORKSPACE_PATH: &'static str = "/home/daan/workspace/";
 
 fn main() {
     let mut args = env::args();
@@ -11,29 +12,22 @@ fn main() {
     let mode = args.next();
     match mode {
         Some(mode) => {
-            let query = args.next();
-            match query {
+            match args.next() {
                 Some(query) => {
                     let query_path = PathBuf::from(&query);
+                    let base_iter = path_match(&query, true).unwrap();
                     
-                    if query_path.exists() {
-                        println!("{}", query);
-                        if mode == "go" { return; }    
-                    }
-                    let mut query_root = query_path.clone();
-                    let query_name = match query_path.file_name() {
-                        Some(os_string) => { 
-                            query_root.pop();
-                            os_string.to_str().unwrap() 
+                    let mut total_iter: Box<Iterator<Item=String>> = match query_path.has_root() {
+                        true => Box::new(base_iter),
+                        false => {
+                            let mut workspace_path = PathBuf::from(WORKSPACE_PATH);
+                            workspace_path.push(&query_path);
+                            let workspace_iter = path_match(workspace_path.to_str().unwrap(), mode == "go").unwrap().chain(base_iter);
+                            Box::new(workspace_iter)
                         },
-                        None => ""    
-                    }; 
-                    let workspace_iter = match query_root.has_root() {
-                        false => search_dir(query_name, PathBuf::from(WORKSPACE_PATH), mode == "go"),
-                        true => Vec::new().into_iter()   
+                        
                     };
-                    let base_iter = search_dir(query_name, query_root, true);
-                    let mut total_iter = workspace_iter.chain(base_iter);
+                    
                     if mode == "go" {
                         match total_iter.next() {
                             Some(string) => return println!("{}", string),
@@ -44,33 +38,64 @@ fn main() {
                         println!("{}", string);    
                     }
                 },
-                None => return    
+                None => {
+                    if mode != "list" { return }
+                    for string in path_match(WORKSPACE_PATH, false).unwrap() {
+                        println!("{}", string);    
+                    }
+                }   
             }
         },
-        None => return    
+        None => return println!("No mode")    
     }
     
 }
 
-fn search_dir(query: &str, dir: PathBuf, full_path: bool) -> vec::IntoIter<String> {
-    let iter = match fs::read_dir(dir.as_path()) {
-        Ok(it) => it,
-        Err(_) => return Vec::new().into_iter()
-    };
+fn path_match(query_path: &str, full_path: bool) -> Result<vec::IntoIter<String>, Error> {
+    let mut query_buf = PathBuf::from(query_path);
     let mut dirs = Vec::new();
-    for item in iter {
-        let name = String::from(item.unwrap().file_name().to_str().unwrap());
-        if name.starts_with(query){ 
-            if full_path {
-                let mut path = PathBuf::new();
-                path.push(dir.as_path());
-                path.push(name);
-                dirs.push(String::from(path.to_str().unwrap()))   
-            }
-            else {
-                dirs.push(name)    
-            }
+    let clone = query_buf.clone();
+    let query = match clone.file_name() {
+          Some(file_name) => {
+              //Handle queries that are relative but are not prefixed with ./
+              if query_buf.components().count() == 1 {
+                      query_buf = PathBuf::from("./");
+                      query_path
+              }
+              //Handle queries that end in /
+              else if query_path.ends_with("/") { 
+                  ""
+              }
+              else {
+                  query_buf.pop(); //Pop filename
+                  file_name.to_str().unwrap_or("")
+              }
+          },
+          None => {
+              dirs.push(String::from(query_path));
+              ""    
+          }
+    };
+    let dir_iter = match fs::read_dir(query_buf.as_path()) {
+        Ok(iter) => iter,
+        Err(_) => return Ok(Vec::new().into_iter())
+    };
+    for dir in dir_iter {
+        let dir = dir.unwrap();
+        let mut dir_name = String::from(dir.file_name().to_str().unwrap());
+        if dir_name.starts_with(query) && dir.file_type().unwrap().is_dir() {
+            match full_path {
+                true => {
+                    let mut full_path = String::from(dir.path().to_str().unwrap());
+                    full_path.push('/');
+                    dirs.push(full_path)
+                },
+                false => {
+                    dir_name.push('/');
+                    dirs.push(dir_name)
+                }
+            }    
         }
     }
-    return dirs.into_iter()
+    return Ok(dirs.into_iter());
 }
