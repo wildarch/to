@@ -2,16 +2,29 @@
 TO="/usr/bin/to"
 
 function _to_go {
-	cd "$($TO go $1)"
+
+	case "$1" in
+		"--add" | "-a")
+			$TO add $2
+			;;
+		"--dirs" | "-d")
+			$TO dirs
+			;;
+		"--remove" | "-r")
+			$TO remove $2
+			;;
+		*)
+			cd "$($TO go $1)"
+	esac
 }
 alias to="_to_go"
 
 function _to_list {
 	local cur
 	local res
-	
+
 	COMPREPLY=()
-	
+
 	cur=${COMP_WORDS[COMP_CWORD]}
 	res=$( $TO list $cur )
 	if [ -n "$res" ]; then

@@ -1,7 +1,6 @@
 use std::path::{PathBuf, Path};
 use std::io::Error;
 use std::fs::read_dir;
-use std::fmt;
 
 #[derive(Debug)]
 pub struct Directory {
@@ -9,14 +8,8 @@ pub struct Directory {
     pub name: String
 }
 
-impl fmt::Display for Directory {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "name: {}, path: {}", self.name, self.path.to_str().unwrap())
-    }
-}
-
 impl Directory {
-    pub fn path_str<'a>(&'a self) -> &'a str{
+    pub fn path_str(&self) -> &str{
         self.path.to_str().unwrap()
     }
 }
