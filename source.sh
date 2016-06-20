@@ -1,5 +1,5 @@
 #!/bin/bash
-TO="/usr/bin/to"
+TO="$HOME/.cargo/bin/to"
 
 function _to_go {
 
@@ -7,7 +7,7 @@ function _to_go {
 		"--add" | "-a")
 			$TO add $2
 			;;
-		"--dirs" | "-d")
+		"--dirs" | "-d" | "--list" | "-l")
 			$TO dirs
 			;;
 		"--remove" | "-r")
@@ -28,7 +28,7 @@ function _to_list {
 	cur=${COMP_WORDS[COMP_CWORD]}
 	res=$( $TO list $cur )
 	if [ -n "$res" ]; then
-		mapfile -t COMPREPLY < <(/usr/bin/to list $cur)
+		mapfile -t COMPREPLY < <($TO list $cur)
 	fi
 	compopt -o nospace
 	return 0

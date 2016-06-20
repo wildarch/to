@@ -14,7 +14,8 @@ use directory::{find_in, Directory};
 mod settings;
 use settings::Settings;
 
-const CONF_PATH : &'static str = ".config/to";
+const CONF_PATH : &'static str = ".config/to"; //Relative from the user's home directory
+
 
 fn main() {
     let mut args = env::args();
@@ -55,7 +56,7 @@ fn main() {
 
     let mut results = settings.directories.into_iter().flat_map(move |dir|{
         let path = Path::new(&dir);
-        find_in(&query, path).unwrap()
+        find_in(&query_string, path).unwrap()
     });
 
     match mode.as_ref() {
@@ -133,7 +134,7 @@ fn get_settings() -> Settings {
     conf_path.push(CONF_PATH);
     let file = File::open(&conf_path);
     match file {
-        Ok(file) => Settings::from(file),
+        Ok(file) => Settings::from_file(file).unwrap_or(Settings::new()),
         Err(_) => Settings::new()
     }
 }

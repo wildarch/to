@@ -16,25 +16,9 @@ impl Directory {
 
 pub type DirIter = Box<Iterator<Item = Directory>>;
 
-pub fn find_in(query: &Path, origin: &Path) -> Result<DirIter, Error> {
-    let mut base_dir = PathBuf::from(origin);
-    // We have to adjust the base directory if needed
-    let mut components = query.components();
-    let num_comp = query.components().count();
-
-    if num_comp > 0 {
-        for comp in components.by_ref().take(num_comp-1) {
-            let string = comp.as_os_str().to_str().expect("Invalid character in os str");
-            base_dir.push(string);
-        }
-    }
-
-    let query = match components.next() {
-        Some(comp) => comp.as_os_str().to_str().unwrap(),
-        None => ""
-    };
-
+pub fn find_in(query: &str, origin: &Path) -> Result<DirIter, Error> {
     let query = String::from(query);
+    let base_dir = PathBuf::from(origin);
 
     Ok(
         Box::new(

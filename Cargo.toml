@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Daan de Graaf <daandegraaf9@gmail.com>"]
 
 [dependencies]
-clippy = "*"
 serde = "*"
 serde_json = "*"
 serde_macros = "*"
