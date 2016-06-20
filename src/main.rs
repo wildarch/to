@@ -14,7 +14,7 @@ use directory::{find_in, Directory};
 mod settings;
 use settings::Settings;
 
-const CONF_PATH : &'static str = ".config/to"; //Relative from the user's home directory
+const CONF_PATH: &'static str = ".config/to"; //Relative from the user's home directory
 
 
 fn main() {
@@ -23,7 +23,7 @@ fn main() {
 
     let mode = match args.next() {
         Some(mode) => mode,
-        None => return println!("Mode not specified!")
+        None => return println!("Mode not specified!"),
     };
 
     let settings = get_settings();
@@ -36,46 +36,41 @@ fn main() {
             if query_string.is_empty() {
                 let cwd = env::current_dir().unwrap();
                 add(&cwd, settings);
-            }
-            else {
+            } else {
                 add(&query, settings);
             }
-            return
-        },
+            return;
+        }
         "remove" => {
             remove(&query_string, settings);
-            return
-        },
+            return;
+        }
         "dirs" => {
             list_dirs(settings);
-            return
+            return;
         }
-        //list, go or an invalid mode
+        // list, go or an invalid mode
         _ => {}
     }
 
-    let mut results = settings.directories.into_iter().flat_map(move |dir|{
+    let mut results = settings.directories.into_iter().flat_map(move |dir| {
         let path = Path::new(&dir);
         find_in(&query_string, path).unwrap()
     });
 
     match mode.as_ref() {
-        "go" => {
-            go(&mut results)
-        },
-        "list" => {
-            list(&mut results)
-        },
-        _ => println!("Invalid mode specified!")
+        "go" => go(&mut results),
+        "list" => list(&mut results),
+        _ => println!("Invalid mode specified!"),
     }
 }
 
-type ResultIter = Iterator<Item=Directory>;
+type ResultIter = Iterator<Item = Directory>;
 
-fn go(results: &mut ResultIter){
+fn go(results: &mut ResultIter) {
     match results.next() {
         Some(dir) => println!("{}", dir.path_str()),
-        None => println!("No results found!")
+        None => println!("No results found!"),
     }
 }
 
@@ -85,7 +80,7 @@ fn list(results: &mut ResultIter) {
     }
 }
 
-fn add(path: &Path, mut settings: Settings){
+fn add(path: &Path, mut settings: Settings) {
     if path.is_dir() {
         let string = if path.is_absolute() {
             String::from(path.to_str().unwrap())
@@ -96,18 +91,17 @@ fn add(path: &Path, mut settings: Settings){
         };
         if settings.directories.contains(&string) {
             println!("Directory {} already in list:", &string);
-            return list_dirs(settings)
+            return list_dirs(settings);
         }
         println!("Directory '{}' added", &string);
         settings.directories.push(string);
         save_settings(settings);
-    }
-    else {
+    } else {
         println!("Invalid path specified!");
     }
 }
 
-fn remove(index: &str, mut settings: Settings){
+fn remove(index: &str, mut settings: Settings) {
     let index: usize = match index.parse() {
         Ok(index) => index,
         Err(_) => {
@@ -123,7 +117,7 @@ fn remove(index: &str, mut settings: Settings){
     save_settings(settings);
 }
 
-fn list_dirs(settings: Settings){
+fn list_dirs(settings: Settings) {
     for (index, dir) in settings.directories.iter().enumerate() {
         println!("[{}] {}", index, dir);
     }
@@ -135,15 +129,15 @@ fn get_settings() -> Settings {
     let file = File::open(&conf_path);
     match file {
         Ok(file) => Settings::from_file(file).unwrap_or(Settings::new()),
-        Err(_) => Settings::new()
+        Err(_) => Settings::new(),
     }
 }
 
-fn save_settings(settings: Settings){
+fn save_settings(settings: Settings) {
     let mut conf_path = env::home_dir().unwrap();
     conf_path.push(CONF_PATH);
     match settings.save(&conf_path) {
         Ok(_) => println!("Settings saved"),
-        Err(e) => println!("Error saving settings: {}", e)
+        Err(e) => println!("Error saving settings: {}", e),
     }
 }
