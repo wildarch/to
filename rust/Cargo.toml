@@ -2,8 +2,11 @@
 name = "to"
 version = "0.1.0"
 authors = ["Daan de Graaf <daandegraaf9@gmail.com>"]
+build = "build.rs"
 
 [dependencies]
-serde = "*"
-serde_json = "*"
-serde_macros = "*"
+serde = "0.8"
+serde_json = "0.8"
+
+[build-dependencies]
+serde_codegen = "0.8"

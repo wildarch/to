@@ -1,6 +1,3 @@
-#![feature(custom_derive, plugin)]
-#![plugin(serde_macros)]
-
 extern crate serde;
 extern crate serde_json;
 
@@ -15,7 +12,6 @@ mod settings;
 use settings::Settings;
 
 const CONF_PATH: &'static str = ".config/to"; //Relative from the user's home directory
-
 
 fn main() {
     let mut args = env::args();
@@ -47,6 +43,10 @@ fn main() {
         }
         "dirs" => {
             list_dirs(settings);
+            return;
+        }
+        "version" => {
+            println!("To: Rust version");
             return;
         }
         // list, go or an invalid mode

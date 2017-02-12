@@ -7,10 +7,7 @@ use std::io::Error;
 use std::convert::Into;
 use std::path::Path;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Settings {
-    pub directories: Vec<String>
-}
+include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 
 impl Settings {
     pub fn new() -> Settings {
