@@ -1,11 +1,11 @@
 # To
-Access your favorite directories with ease
+Change directory to any of your favorite folders with a single short command, wherever your are.
 
 # Usage
     cd ~/workspace # Directory containing your often accessed folder 'project'
     to -a # Adds the current directory to your favorites
     
-    cd  ~/somewhere/else/completely
+    cd  ~/somewhere/else/entirely
     # Changes the current directory to ~/workspace/project
     to project
     # Or type:
