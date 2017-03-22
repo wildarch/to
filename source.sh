@@ -2,7 +2,8 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-target=lua
+# Use this to change the target implementation
+target=haskell
 
 case "$target" in
     rust)
@@ -13,6 +14,9 @@ case "$target" in
         ;;
     python)
         TO="$DIR/python/main.py"
+        ;;
+    haskell)
+        TO="$DIR/haskell/.stack-work/install/x86_64-linux/lts-8.0/8.0.2/bin/haskell-exe"
         ;;
     *)
         echo "Error! Unknown target language $target"

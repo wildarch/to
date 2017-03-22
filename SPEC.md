@@ -13,6 +13,9 @@ Settings are stored at $HOME/.config/to
 If the file at $HOME/.config/to does not exist:
 1. Create path $HOME/.config/to
 2. Create a settings file with no directories
+
+If the file can not be parsed as valid JSON or does not adhere to the format, 
+the implementation should output "Error: *$HOME*/.config/to is not valid" and exit immediately.
     
 ## Saving
 Always save the settings file in **pretty printed** JSON.
@@ -29,8 +32,8 @@ Return the names of all directories *dir* such that:
 It is possible that some of the directories in the settings file are no longer valid (i.e. were deleted), 
 these should be ignored.
 
-If the file can not be parsed as valid JSON or does not adhere to the format, 
-the implementation should output "Error: *$HOME*/.config/to is not valid" and exit immediately.
+output:
+* The names all directories satisfying (1) and (2), if any.
 
 ## go
     to go [query]
@@ -43,9 +46,11 @@ Returns the absolute path to the directory *dir* such that:
 The requirements can for example be met by first getting all sub-directories of all directories in the settings file,
  filtering on names that start with *query* and then sorting with a **stable** sorting algorithm ascending based on name length. 
  Then return the first element of this list, if any.
-
+ 
 output:
-* The names all directories satisfying (1) and (2), if any.
+* "*dir*" if found
+* "Error: no results found" if no *dir* exists
+
 
 ## add
     to add [dir]
