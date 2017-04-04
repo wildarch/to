@@ -170,4 +170,5 @@ fn save_settings(settings: &Settings) {
         Ok(_) => println!("Settings saved"),
         Err(e) => println!("Error saving settings: {}", e),
     }
+
 }
