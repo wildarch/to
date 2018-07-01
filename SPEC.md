@@ -8,6 +8,7 @@ Settings are stored at $HOME/.config/to
             "dir2"
         ]
     }
+Directories must be absolute paths
     
 ## Loading
 If the file at $HOME/.config/to does not exist:
