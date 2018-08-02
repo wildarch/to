@@ -48,6 +48,7 @@ function check() {
 
 EXP=$'sub_a1\nsub_a2'
 ACT="$(HOME=$(readlink -e fake_home) $TEST_BIN list sub)"
+ACT=$(echo "$ACT" | sort)
 check "Lists the correct subdirectories"  "$EXP"  "$ACT"
 
 EXP="sub_a2"
@@ -56,6 +57,7 @@ check "Distinguishes based on directory name"  "$EXP"  "$ACT"
 
 EXP=$'su\nsub_a1\nsub_a2'
 ACT="$(HOME=$(readlink -e fake_home) $TEST_BIN list su)"
+ACT=$(echo "$ACT" | sort)
 check "Lists directories from multiple base dirs"  "$EXP"  "$ACT"
 
 EXP=$(readlink -e fake_home/dir_b/su)
